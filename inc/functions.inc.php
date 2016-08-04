@@ -1,40 +1,46 @@
 <?php
 
-    function retrieveEntries($db, $id=NULL)
+    function retrieveEntries($db,$page, $url=NULL)
     {
         //get entries
-        if(isset($id))                  //if an entry ID was given, load it
-        {
+        if(isset($url)) {             //if an entry url was given
             //load entry
-            $sql = "SELECT title, entry
+            $sql = "SELECT id, page, title, entry
                     FROM entries
-                    WHERE id=?
+                    WHERE url=?
                     LIMIT 1";
             $stmt=$db->prepare($sql);
-            $stmt->execute(array($_GET['id']));
+            $stmt->execute(array($url));
             //save returned entry array
             $e=$stmt->fetch();
             $fulldisp=1;
         }
-        else                           //if no entry ID was given, load all
-        {
+        else {                        //if no entry url was given
             //load all entry
-            $sql = "SELECT id, title 
+            $sql = "SELECT id, page, title, entry, url 
                     FROM entries
+                    WHERE page=?
                     ORDER BY created DESC";
-            foreach($db->query($sql) as $row) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array($page));
+            $e = NULL;
+            while($row = $stmt->fetch()) {
+                $e[] = $row;
+                $fulldisp = 0;
+            }
+            /*foreach($db->query($sql) as $row) {
                 $e[] = array(
                     'id' => $row['id'],
                     'title' => $row['title']
                 );
-            }
-            $fulldisp = 0;
+            }*/
+
 
             if (!is_array($e)) {
                 $fulldisp = 1;
                 $e = array(
                     'title' => 'No entries Yet',
-                    'entry' => '<a href="/index.php">Post an entry!</a>'
+                    'entry' => '<a href="/admin.php">Post an entry!</a>'
                 );
             }
         }
