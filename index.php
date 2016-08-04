@@ -33,6 +33,10 @@
 
 <body>
 	<h1> Simple Blog Application </h1>
+    <ul id="menu">
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="/about/">About the Author</a></li>
+    </ul>
 	<div id="entries">
 <?php
 	//format entries

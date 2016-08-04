@@ -25,8 +25,13 @@
             $stmt->execute(array($page));
             $e = NULL;
             while($row = $stmt->fetch()) {
-                $e[] = $row;
-                $fulldisp = 0;
+                if($page == 'blog') {
+                    $e[] = $row;
+                    $fulldisp = 0;
+                } else {
+                    $e = $row;
+                    $fulldisp = 1;
+                }
             }
             /*foreach($db->query($sql) as $row) {
                 $e[] = array(
@@ -40,7 +45,7 @@
                 $fulldisp = 1;
                 $e = array(
                     'title' => 'No entries Yet',
-                    'entry' => '<a href="/admin.php">Post an entry!</a>'
+                    'entry' => '<a href="/admin/about">Post an entry!</a>'
                 );
             }
         }
@@ -63,5 +68,15 @@
             //call sanitize recursively
             return array_map('sanitizeData',$data);
         }
+    }
+
+    function makeURL($title)
+    {
+        $patterns = array(
+            '/\s+/',
+            '/(?!-)\W+/'
+        );
+        $replacements = array('-','');
+        return preg_replace($patterns,$replacements,strtolower($title));
     }
 ?>
