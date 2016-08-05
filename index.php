@@ -46,9 +46,17 @@
         $url = (isset($url)) ? $url : $e['url'];
         //build admin links
         $admin = adminLinks($page, $url);
+		//format the image if it exists
+//        echo "<pre>";
+//        print_r($e);
+//        echo "</pre>";
+//        die;
+		$img = formatImage($e['image'],$e['title']);
+
 ?>
-		<h2> <?php echo $e['title']?> </h2>
-		<p> <?php echo $e['entry']?> </p>
+		<h2> <?php echo $e['title']?></h2>
+		<p> <?php echo $img,"<br/>",$e['entry']?></p>
+		<p> <?php //echo $e['entry']?></p>
         <p>
             <?php echo $admin['edit']?>
             <?php if($page == 'blog') echo $admin['delete']?>
@@ -65,7 +73,7 @@
 			<p>
 				<a href="/<?php echo $entry['page']?>/
 						<?php echo $entry['url']?>">
-						<?php echo $entry['title'] ?>
+						<?php echo $entry['title']?>
 				</a>
 			</p>
             <?php
@@ -74,10 +82,10 @@
 ?>
 	<p class="backlink">
         <?php
-        //if ($page=='blog') :
+        if ($page=='blog') :
         ?>
-		<a href="/admin/<?php echo $page ?>">Post a New Entry</a>
-        <?php //endif;
+		<a href="/admin/<?php echo $page?>">Post a New Entry</a>
+        <?php endif;
         ?>
 	</p>
 	</div>

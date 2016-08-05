@@ -5,7 +5,7 @@
         //get entries
         if(isset($url)) {             //if an entry url was given
             //load entry
-            $sql = "SELECT id, page, title, entry
+            $sql = "SELECT id, page, title, image, entry
                     FROM entries
                     WHERE url=?
                     LIMIT 1";
@@ -17,7 +17,7 @@
         }
         else {                        //if no entry url was given
             //load all entry
-            $sql = "SELECT id, page, title, entry, url 
+            $sql = "SELECT id, page, title, image, entry, url 
                     FROM entries
                     WHERE page=?
                     ORDER BY created DESC";
@@ -116,5 +116,14 @@ FORM;
                 LIMIT 1";
         $stmt = $db->prepare($sql);
         return $stmt->execute(array($url));
+    }
+
+    function formatImage($img=NULL, $alt=NULL)
+    {
+        if($img!=NULL){
+            return '<img src="'.$img.'"alt="'.$alt.'"/>';
+        } else {
+            return NULL;
+        }
     }
 ?>
