@@ -49,11 +49,16 @@
         //build admin links
         $admin = adminLinks($page, $url);
 		//format the image if it exists
-//        echo "<pre>";
-//        print_r($e);
-//        echo "</pre>";
-//        die;
 		$img = formatImage($e['image'],$e['title']);
+        if($page == 'blog'){
+            //load comment object
+            include_once 'inc/comments.inc.php';
+            $comments = new Comments();
+            $comments_disp = $comments->showComments($e['id']);
+            $comment_form = $comments->showCommentForm($e['id']);
+        } else {
+            $comment_form = NULL;
+        }
 
 ?>
 		<h2> <?php echo $e['title']?></h2>
@@ -67,7 +72,8 @@
 		    <p class="backlink">
 		    	<a href="./">Back to the Latest Entries</a>
 		    </p>
-        <?php endif; ?>
+        <h3>Comments for this entry</h3>
+        <?php echo $comments_disp, $comment_form; endif; ?>
 <?php
 	} else {
 		foreach($e as $entry) {

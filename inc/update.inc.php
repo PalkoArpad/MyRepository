@@ -65,7 +65,56 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
         header('Location: /'.$page.'/'.$url);
         exit;
 }
-else {
+
+//if a comment is being posted, handle it here
+else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post comment')
+    {
+        //include and instantiate Comments class
+        include_once 'comments.inc.php';
+        $comments = new Comments();
+        //save the comment
+        if($comments->saveComment($_POST)){
+            //if available, store the entry the use came from
+            if(isset($_SERVER['HTTP_REFERER'])){
+                $loc = $_SERVER['HTTP_REFERER'];
+            } else {
+                $loc = '../';
+            }
+            //send the user back to the entry
+            header('Location:'.$loc);
+            exit;
+        } else { //if saving fails
+            exit('Something went wrong while saving the comment.');
+        }
+    }
+    else if($_GET['action'] == 'comment_delete'){
+        //include and instantiate the Comments class
+        include_once 'comments.inc.php';
+        $comments = new Comments();
+        echo $comments->confirmDelete($_GET['id']);
+        exit;
+    }
+    else if(($_SERVER['REQUEST_METHOD'] == 'POST')
+        && $_POST['action'] == 'comment_delete'){
+        //if set, store the entry from which we came
+        $loc = isset($_POST['url']) ? $_POST['url'] : '../';
+        //if Yes was clicked, continue with deletion
+        if($_POST['confirm'] == "Yes"){
+            //include and instantiate Comment class
+            include_once 'comments.inc.php';
+            $comments = new Comments();
+            //delete the comment and return to entry
+            if($comments->deleteComment($_POST['id'])){
+                header('Location:'.$loc);
+            } else {  //if deleting fails
+                exit('Could not delete the comment.');
+            }
+        } else {   //if the user clicked no
+            header('Location:'.$loc);
+            exit;
+        }
+    }
+    else {
     header('Location:../');
     exit;
 }
