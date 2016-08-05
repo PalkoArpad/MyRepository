@@ -1,4 +1,7 @@
 <?php
+session_start();
+    //if the user is logged in, continue
+if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
     include_once 'inc/functions.inc.php';
     include_once 'inc/db.inc.php';
 
@@ -34,6 +37,9 @@
         $title = $e['title'];
         $entry = $e['entry'];
     } else {
+        if($page == 'createuser'){
+            $create = createUserForm();
+        }
         $legend = "New entry submission";
         //if not editing, set variables to null
         $id = NULL;
@@ -57,7 +63,11 @@
         if($page == 'delete'):
         {
         echo $confirm;
-        } else :
+        }
+        elseif($page == 'createuser'):{
+            echo $create;
+        }
+        else :
     ?>
         <form method="post" action="/inc/update.inc.php" enctype="multipart/form-data">
             <fieldset>
@@ -83,4 +93,35 @@
     <?php endif; ?>
     </body>
 </html>
+    <?php
+    //the user is not logged in
+    else: ?>
+    <!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 STRICT//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <head>
+            <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+            <link rel="stylesheet" href="/css/stylesheet.css" type="text/css"/>
+            <title>Please Log In</title>
+        </head>
+        <body>
+            <form method="post" action="/inc/update.inc.php"
+                  enctype="multipart/form-data">
+                <fieldset>
+                    <legend>Please log in to continue</legend>
+                    <label>Username
+                        <input type="text" name="username" maxlength="75"/>
+                    </label>
+                    <label>Password
+                        <input type="password" name="password" maxlength="150"/>
+                    </label>
+                    <input type="hidden" name="action" value="login"/>
+                    <input type="submit" name="submit" value="Log In"/>
+                </fieldset>
+            </form>
+
+        </body>
+    </html>
+<?php endif; ?>
 

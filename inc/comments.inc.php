@@ -96,10 +96,14 @@ FORM;
                     $date = date($format, strtotime($c['date']));
                     $byline = "<span><strong>$c[name]</strong>
                         [Posted on $date]</span>";
-                    //generate delete link for the comment display
-                    $admin = "<a href=\"/inc/update.inc.php"
-                        ."?action=comment_delete&id=$c[id]\""
-                        ."class=\"admin\">delete</a>";
+                    if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1) {
+                        //generate delete link for the comment display
+                        $admin = "<a href=\"/inc/update.inc.php"
+                            . "?action=comment_delete&id=$c[id]\""
+                            . "class=\"admin\">delete</a>";
+                    } else {
+                        $admin = NULL;
+                    }
                 } else {
                     //if we get here no comments exist
                     $byline = NULL;

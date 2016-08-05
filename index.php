@@ -1,4 +1,5 @@
 <?php
+    session_start();
 	include_once 'inc/functions.inc.php';
 	include_once 'inc/db.inc.php';
 	//open db connection
@@ -39,6 +40,13 @@
         <li><a href="/blog/">Blog</a></li>
         <li><a href="/about/">About the Author</a></li>
     </ul>
+    <?php
+        if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):?>
+        <p id="control_panel">
+            You are logged in!
+            <a href="/inc/update.inc.php?action=logout">Log out</a>.
+        </p>
+        <?php endif; ?>
 	<div id="entries">
 <?php
 	//format entries
@@ -46,8 +54,12 @@
 	if($fulldisp == 1) {
         //get url
         $url = (isset($url)) ? $url : $e['url'];
-        //build admin links
-        $admin = adminLinks($page, $url);
+        if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1) {
+            //build admin links
+            $admin = adminLinks($page, $url);
+        } else {
+            $admin = array('edit' => NULL, 'delete' => NULL);
+        }
 		//format the image if it exists
 		$img = formatImage($e['image'],$e['title']);
         if($page == 'blog'){
@@ -90,11 +102,11 @@
 ?>
 	<p class="backlink">
         <?php
-        if ($page=='blog') :
+        if ($page=='blog' && isset($_SESSION['loggedin'])
+                            && $_SESSION['loggedin'] == 1) :
         ?>
 		<a href="/admin/<?php echo $page?>">Post a New Entry</a>
-        <?php endif;
-        ?>
+        <?php endif; ?>
 	</p>
     <p>
         <a href="/feeds/rss.php">Subscribe via RSS!</a>
