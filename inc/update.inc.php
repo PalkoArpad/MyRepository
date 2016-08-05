@@ -17,14 +17,12 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
             $img_path = $img->processUploadedImage($_FILES['image']);
         }
         catch(Exception $e){
-            die($e->getMessage());
+            $e->getMessage();
         }
     } else {
         //avoid a notice if no image was uploaded
         $img_path = NULL;
     }
-    //echo "Image Path: ",$img_path, "<br/>";
-    //exit;
     //output contents of $_FILES
     //include credentials
     include_once 'db.inc.php';
