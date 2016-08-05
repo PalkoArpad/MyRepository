@@ -5,7 +5,7 @@
         //get entries
         if(isset($url)) {             //if an entry url was given
             //load entry
-            $sql = "SELECT id, page, title, image, entry
+            $sql = "SELECT id, page, title, image, entry, created
                     FROM entries
                     WHERE url=?
                     LIMIT 1";
@@ -17,7 +17,7 @@
         }
         else {                        //if no entry url was given
             //load all entry
-            $sql = "SELECT id, page, title, image, entry, url 
+            $sql = "SELECT id, page, title, image, entry, url, created 
                     FROM entries
                     WHERE page=?
                     ORDER BY created DESC";

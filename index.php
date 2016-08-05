@@ -28,6 +28,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 	<link rel="stylesheet" href="/css/stylesheet.css" type="text/css"/>
+    <link rel="alternate" type="application/rss+xml" title="My Simple Blog - RSS 2.0"
+          href="/feeds/rss.php"/>
 	<title> Simple Blog </title>
 </head>
 
@@ -88,6 +90,9 @@
         <?php endif;
         ?>
 	</p>
+    <p>
+        <a href="/feeds/rss.php">Subscribe via RSS!</a>
+    </p>
 	</div>
 </body>
 </html>
