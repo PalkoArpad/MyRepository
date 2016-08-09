@@ -30,6 +30,7 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
     $db = new PDO(DB_INFO, DB_USER, DB_PASS);
     //edit an existing entry
     if(!empty($_POST['id'])){
+        $url = $url . $_POST['id'];
         $sql = "UPDATE entries
                 SET title=?, longitude=?, latitude=?, image=?, entry=?, url=?
                 WHERE id=?
