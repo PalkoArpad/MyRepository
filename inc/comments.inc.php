@@ -11,22 +11,52 @@
             $this->db = new PDO(DB_INFO,DB_USER,DB_PASS);
         }
 
-        public function showCommentForm($blod_id)
+        public function showCommentForm($blog_id)
         {
+            $errors = array(
+                1 => '<p class="error">Something went wrong while saving '
+                        . 'your comment. Please try again!</p>',
+                2 => '<p class="error">Please provide a valid email address!</p>',
+                3 => '<p class="error">Please answer the anti-spam question correctly!</p>'
+            );
+            if(isset($_SESSION['error'])){
+                $error = $errors[$_SESSION['error']];
+            } else {
+                $error = NULL;
+            }
+            //check if session variable exist
+            if(isset($_SESSION['c_name'])){
+                $n = $_SESSION['c_name'];
+            } else {
+                $n = NULL;
+            }
+            if(isset($_SESSION['c_email'])){
+                $e = $_SESSION['c_email'];
+            } else {
+                $e = NULL;
+            }
+            if(isset($_SESSION['c_comment'])){
+                $c = $_SESSION['c_comment'];
+            } else {
+                $c = NULL;
+            }
+            //generate a challenge question
+            $challenge = $this->generateChallenge();
+
             return <<<FORM
         <form action="/inc/update.inc.php" method="post" id="comment-form">
         <fieldset>
-            <legend>Post a Comment</legend>
+            <legend>Post a Comment</legend>$error
             <label>Name
-                <input type="text" name="name" maxlength="75"/>
+                <input type="text" name="name" maxlength="75" value="$n"/>
             </label>
             <label>Email
-                <input type="text" name="email" maxlength="150"/>
+                <input type="text" name="email" maxlength="150" value="$e"/>
             </label>
             <label>Comment
-                <textarea rows="10" cols="45" name="comment"></textarea>
-            </label>
-            <input type="hidden" name="blog_id" value="$blod_id"/>
+                <textarea rows="10" cols="45" name="comment">$c</textarea>
+            </label>$challenge
+            <input type="hidden" name="blog_id" value="$blog_id"/>
             <input type="submit" name="submit" value="Post comment"/>
             <input type="submit" name="submit" value="Cancel"/>
         </fieldset>
@@ -36,6 +66,20 @@ FORM;
 
         public function saveComment($p)
         {
+            //save comment info in a session
+            $_SESSION['c_name'] = htmlentities($p['name'], ENT_QUOTES);
+            $_SESSION['c_email'] = htmlentities($p['email'], ENT_QUOTES);
+            $_SESSION['c_comment'] = htmlentities($p['comment'], ENT_QUOTES);
+            //make sure the email is valid
+            if($this->validateEmail($p['email']) === FALSE){
+                $_SESSION['error'] = 2;
+                return;
+            }
+            //make sure the challenge was answered properly
+            if(!$this->verifyResponse($p['s_q'],$p['s_1'],$p['s_2'])){
+                $_SESSION['error'] = 3;
+                return;
+            }
             //sanitize data and store it in variables
             $blog_id = htmlentities(strip_tags($p['blog_id']),ENT_QUOTES);
             $name = htmlentities(strip_tags($p['name']),ENT_QUOTES);
@@ -50,9 +94,13 @@ FORM;
                 //execute cmd, free used memory, return true
                 $stmt->execute(array($blog_id,$name,$email,$comment));
                 $stmt->closeCursor();
-                return TRUE;
+                //destroy the comment information to empty the form
+                unset($_SESSION['c_name'],$_SESSION['c_email'],
+                      $_SESSION['c_comment'],$_SESSION['error']);
+                return;
             } else {
-                return FALSE;
+                $_SESSIONp['error'] = 1;
+                return;
             }
         }
 
@@ -165,6 +213,40 @@ FORM;
             } else {
                 return FALSE;
             }
+        }
+
+        private function validateEmail($email)
+        {
+            //matches valid email address
+            $p = '/^[\w-]+(\.[\w-]+)*@[a-z0-9-]+'
+                .'(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i';
+
+            //if match found, return true, otherwise return false
+            return(preg_match($p,$email)) ? TRUE : FALSE;
+        }
+
+        private function generateChallenge()
+        {
+            //store two random numbers in an array
+            $numbers = array(mt_rand(1,4),mt_rand(1,4));
+            //store the correct answer in a session
+            $_SESSION['challenge'] = $numbers[0] + $numbers[1];
+            //convert the numbers to their ASCII
+            $converted = array_map('ord', $numbers);
+            //generate a math question as HTML markup
+            return "
+            <label>&#87;&#104;&#97;&#116;&#32;&#105;&#115;&#32;
+                    &#$converted[0];&#32;&#43;&#32;&#$converted[1];&#63;
+                    <input type=\"text\" name=\"s_q\" />
+            </label>";
+        }
+
+        private function verifyResponse($resp)
+        {
+            //grab session value and destroy it
+            $val = $_SESSION['challenge'];
+            unset($_SESSION['challenge']);
+            return $resp==$val;
         }
 
 

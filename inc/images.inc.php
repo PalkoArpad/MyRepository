@@ -14,7 +14,7 @@
         /**
          * Resizes/resamples an image uploaded via a web form
          * @param array $upload the array contained in $_FILES
-         * @return string the path to the resized upload file€
+         * @return string the path to the resized upload file
          */
         public function processUploadedImage($file, $rename=TRUE)
         {

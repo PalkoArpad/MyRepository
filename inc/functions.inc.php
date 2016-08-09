@@ -5,7 +5,7 @@
         //get entries
         if(isset($url)) {             //if an entry url was given
             //load entry
-            $sql = "SELECT id, page, title, image, entry, created
+            $sql = "SELECT id, page, title, longitude, latitude, image, entry, created
                     FROM entries
                     WHERE url=?
                     LIMIT 1";
@@ -17,7 +17,7 @@
         }
         else {                        //if no entry url was given
             //load all entry
-            $sql = "SELECT id, page, title, image, entry, url, created 
+            $sql = "SELECT id, page, title, longitude, latitude, image, entry, url, created 
                     FROM entries
                     WHERE page=?
                     ORDER BY created DESC";
@@ -33,19 +33,12 @@
                     $fulldisp = 1;
                 }
             }
-            /*foreach($db->query($sql) as $row) {
-                $e[] = array(
-                    'id' => $row['id'],
-                    'title' => $row['title']
-                );
-            }*/
-
 
             if (!is_array($e)) {
                 $fulldisp = 1;
                 $e = array(
                     'title' => 'No entries Yet',
-                    'entry' => '<a href="/admin/about">Post an entry!</a>'
+                    'entry' => '<a href="/admin/contact">Post an entry!</a>'
                 );
             }
         }
@@ -70,15 +63,7 @@
         }
     }
 
-    function makeURL($title)
-    {
-        $patterns = array(
-            '/\s+/',
-            '/(?!-)\W+/'
-        );
-        $replacements = array('-','');
-        return preg_replace($patterns,$replacements,strtolower($title));
-    }
+
 
     function adminLinks($page, $url)
     {
@@ -118,6 +103,38 @@ FORM;
         return $stmt->execute(array($url));
     }
 
+    function makeURL($title)
+    {
+        $patterns = array(
+            '/\s+/',
+            '/(?!-)\W+/'
+        );
+        $replacements = array('-','');
+        return preg_replace($patterns,$replacements,strtolower($title));
+}
+
+//    function rand_string($length = 5)
+//    {
+//        $char = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//        $charlength = strlen($char);
+//        $random = '';
+//        for($i = 0; $i < $length; $i++){
+//            $random .= $char[rand(0, $charlength) - 1];
+//        }
+//        return $random;
+//    }
+
+    function getImagePath($db,$url)
+    {
+        $sql = "SELECT image FROM entries
+                WHERE url=?
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($url));
+        $p = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $p['image'];
+    }
+
     function formatImage($img=NULL, $alt=NULL)
     {
         if($img!=NULL){
@@ -145,6 +162,28 @@ FORM;
         </fieldset>
     </form>
 FORM;
+    }
+
+    function shortenURL($url)
+    {
+        //format a all to the bit.ly API
+        $api = 'http://api.bit.ly/shorten';
+        $param = 'version=2.0.1&longUrl='.urlencode($url).'&login=phpfab'.
+            '&apiKey=R_7473a7c43c68a73ae08b68ef8e16388e&format=xml';
+        //open connection and load response
+        $uri = $api . "?" . $param;
+        $response = file_get_contents($uri);
+        //parse the output and return shortened URL
+        $bitly = simplexml_load_string($response);
+        return $bitly->results->nodeKeyVal->shortUrl;
+    }
+
+    function postToTwitter($title)
+    {
+        $full = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $short = shortenURL($full);
+        $status = $title. ' '.$short;
+        return 'http://twitter.com/?status='.urlencode($status);
     }
 
 

@@ -11,14 +11,16 @@
         $page='blog';
     }
     $url = (isset($_GET['url'])) ? $_GET['url'] : NULL;
-	//determine if an entry ID was passed in the URL
-	///$id = (isset($_GET['id'])) ? (int) $_GET['id'] : NULL;
 	//load entries
 	$e = retrieveEntries($db,$page,$url);
 	//get $fulldisp flag and remove it
 	$fulldisp = array_pop($e);
 	//sanitize
 	$e = sanitizeData($e);
+//    echo "<pre>";
+//    print_r($e);
+//    echo "</pre>";
+//    die;
 ?>
 
 <!DOCTYPE html
@@ -39,6 +41,7 @@
     <ul id="menu">
         <li><a href="/blog/">Blog</a></li>
         <li><a href="/about/">About the Author</a></li>
+		<li><a href="/contact/">Contact</a></li>
     </ul>
     <?php
         if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):?>
@@ -68,20 +71,39 @@
             $comments = new Comments();
             $comments_disp = $comments->showComments($e['id']);
             $comment_form = $comments->showCommentForm($e['id']);
+			//generate post to Twitter link
+			$twitter = postToTwitter($e['title']);
         } else {
             $comment_form = NULL;
+			$twitter = NULL;
         }
 
 ?>
 		<h2> <?php echo $e['title']?></h2>
 		<p> <?php echo $img,"<br/>",$e['entry']?></p>
-		<p> <?php //echo $e['entry']?></p>
+<!--         harta -->
+        <?php if($e['longitude'] != NULL && $e['latitude'] != NULL){?>
+        <div id="map"></div>
+        <script>
+            function initMap()
+            {
+                var mapDiv = document.getElementById('map');
+                var map = new google.maps.Map(mapDiv, {
+                        center : {lat: <?php echo $e['latitude']?>, lng: <?php echo $e['longitude']?>},
+                        zoom : 8
+                    }
+                )
+            }
+        </script>
+        <script async defer src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBHS5iSlZuLpuSZmIXVLuwsqnieIPKNyE&callback=initMap"></script>
+		<p> <?php }?></p>
         <p>
             <?php echo $admin['edit']?>
             <?php if($page == 'blog') echo $admin['delete']?>
         </p>
         <?php if ($page == 'blog'): ?>
 		    <p class="backlink">
+                <a href="<?php echo $twitter?>">Post to Twitter</a><br/>
 		    	<a href="./">Back to the Latest Entries</a>
 		    </p>
         <h3>Comments for this entry</h3>

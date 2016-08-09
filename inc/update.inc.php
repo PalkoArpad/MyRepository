@@ -31,12 +31,14 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
     //edit an existing entry
     if(!empty($_POST['id'])){
         $sql = "UPDATE entries
-                SET title=?, image=?, entry=?, url=?
+                SET title=?, longitude=?, latitude=?, image=?, entry=?, url=?
                 WHERE id=?
                 LIMIT 1";
         $stmt = $db->prepare($sql);
         $stmt->execute(array(
             $_POST['title'],
+            $_POST['long'],
+            $_POST['lat'],
             $img_path,
             $_POST['entry'],
             $url,
@@ -46,22 +48,32 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
         $stmt->closeCursor();
     } else {
         //save entry to database
-        $sql = "INSERT INTO entries (page, title, image, entry, url) 
-                VALUES (?,?,?,?,?)";
+        $sql = "INSERT INTO entries (page, title, longitude, latitude, image, entry, url) 
+                VALUES (?,?,?,?,?,?,?)";
         $stmt = $db->prepare($sql);
         $stmt->execute(array($_POST['page'],
             $_POST['title'],
+            $_POST['long'],
+            $_POST['lat'],
             $img_path,
             $_POST['entry'],
             $url));
         $stmt->closeCursor();
+        $id_obj = $db->query("SELECT LAST_INSERT_ID()");
+        $id = $id_obj->fetch(PDO::FETCH_ASSOC);
+        $id_obj->closeCursor();
+        $url = $url.$id['LAST_INSERT_ID()'];
+        $last = $id['LAST_INSERT_ID()'];
+        $sql = "UPDATE entries
+                SET url='$url'
+                WHERE id='$last'
+                ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $stmt->closeCursor();
         }
     //sanitize information
         $page = htmlentities(strip_tags($_POST['page']));
-    /*//get id of the last inserted entry
-        $id_obj = $db->query("SELECT LAST_INSERT_ID()");
-        $id = $id_obj->fetch();
-        $id_obj->closeCursor();*/
     //send the user to the new entry
         header('Location: /'.$page.'/'.$url);
         exit;
@@ -74,19 +86,16 @@ else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post commen
         include_once 'comments.inc.php';
         $comments = new Comments();
         //save the comment
-        if($comments->saveComment($_POST)){
-            //if available, store the entry the use came from
-            if(isset($_SERVER['HTTP_REFERER'])){
-                $loc = $_SERVER['HTTP_REFERER'];
-            } else {
-                $loc = '../';
-            }
-            //send the user back to the entry
-            header('Location:'.$loc);
-            exit;
-        } else { //if saving fails
-            exit('Something went wrong while saving the comment.');
+        $comments->saveComment($_POST);
+        //if available, store the entry the use came from
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $loc = $_SERVER['HTTP_REFERER'];
+        } else {
+            $loc = '../';
         }
+            //send the user back to the entry
+        header('Location:'.$loc);
+        exit;
     }
     else if($_GET['action'] == 'comment_delete'){
         //include and instantiate the Comments class
@@ -137,7 +146,7 @@ else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post commen
         header('Location: /');
         exit;
     }
-    //if an adming is being created, save it here
+    //if an admin is being created, save it here
     else if( $_SERVER['REQUEST_METHOD'] == 'POST'
              && $_POST['action'] == 'createuser'
              && !empty($_POST['username'])
@@ -159,7 +168,9 @@ else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post commen
         exit;
     }
     else {
-    header('Location:../');
-    exit;
+        unset($_SESSION['c_name'],$_SESSION['c_email'],
+              $_SESSION['c_comment'],$_SESSION['error']);
+        header('Location:../');
+        exit;
 }
 ?>

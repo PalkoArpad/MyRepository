@@ -1,5 +1,6 @@
 <?php
 session_start();
+
     //if the user is logged in, continue
 if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
     include_once 'inc/functions.inc.php';
@@ -14,7 +15,10 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
     if(isset($_POST['action']) && $_POST['action'] == 'delete'){
         if($_POST['submit'] == 'Yes'){
             $url = htmlentities(strip_tags($_POST['url']));
+            $path = getImagePath($db, $url);
             if(deleteEntry($db,$url)){
+                $absolute = $_SERVER['DOCUMENT_ROOT'].$path;
+                unlink($absolute);
                 header("Location: /");
                 exit;
             } else {
@@ -36,6 +40,8 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
         $id = $e['id'];
         $title = $e['title'];
         $entry = $e['entry'];
+        $long = $e['longitude'];
+        $lat = $e['latitude'];
     } else {
         if($page == 'createuser'){
             $create = createUserForm();
@@ -45,6 +51,8 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
         $id = NULL;
         $title = NULL;
         $entry = NULL;
+        $long = NULL;
+        $lat = NULL;
     }
 ?>
 
@@ -80,9 +88,13 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
                     <input type="file" name="image"/>
                 </label>
                 <label>Entry
-                <textarea name="entry" cols="45" rows="10">
-                    <?php echo sanitizeData($entry)?>
-                </textarea>
+                <textarea name="entry" cols="45" rows="10"><?php echo sanitizeData($entry)?></textarea>
+                </label>
+                <label>Longitude
+                <input type="text" name="long" value="<?php echo sanitizeData($long)?>"/>
+                </label>
+                <label>Latitude
+                <input type="text" name="lat" value="<?php echo sanitizeData($lat)?>"/>
                 </label>
                 <input type="hidden" name="id" value="<?php echo $id?>"/>
                 <input type="hidden" name="page" value="<?php echo $page?>"/>
