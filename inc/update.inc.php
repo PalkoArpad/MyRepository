@@ -30,7 +30,7 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
     $db = new PDO(DB_INFO, DB_USER, DB_PASS);
     //edit an existing entry
     if(!empty($_POST['id'])){
-        $url = $url . $_POST['id'];
+        //$url = $url . $_POST['id'];
         $sql = "UPDATE entries
                 SET title=?, longitude=?, latitude=?, image=?, entry=?, url=?
                 WHERE id=?
@@ -60,6 +60,13 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
             $_POST['entry'],
             $url));
         $stmt->closeCursor();
+        $sql = "SELECT COUNT(url) AS nr FROM entries
+                WHERE url='$url'
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $value = $stmt->fetch();
+        if($value['nr'] > 1){
         $id_obj = $db->query("SELECT LAST_INSERT_ID()");
         $id = $id_obj->fetch(PDO::FETCH_ASSOC);
         $id_obj->closeCursor();
@@ -77,11 +84,24 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
         $page = htmlentities(strip_tags($_POST['page']));
     //send the user to the new entry
         header('Location: /'.$page.'/'.$url);
-        exit;
+        exit;}
 }
 
-//if a comment is being posted, handle it here
-else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post comment')
+    else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == "Save Entry"
+            && ((empty($_POST['page'])) || empty($_POST['title']) || empty($_POST['entry']))){
+        if(empty($_POST['title']) && empty($_POST['entry'])){
+            $_SESSION['error'] = 8;
+        } else if(empty($_POST['entry'])){
+            $_SESSION['error'] = 7;
+        } else if(empty($_POST['title'])){
+            $_SESSION['error'] = 6;
+        }
+        $page = htmlentities(strip_tags($_POST['page']));
+        header("Location:/admin/$page");
+    }
+
+    //if a comment is being posted, handle it here
+    else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post comment')
     {
         //include and instantiate Comments class
         include_once 'comments.inc.php';
@@ -147,21 +167,35 @@ else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post commen
         header('Location: /');
         exit;
     }
+    else if($_SERVER['REQUEST_METHOD'] == 'POST'
+        && $_POST['action'] == 'login'
+        && (empty($_POST['username']) || empty($_POST['password']))){
+
+         if(empty($_POST['username']) && empty($_POST['password'])){
+            $_SESSION['error'] = 11;
+        } else if(empty($_POST['username'])){
+            $_SESSION['error'] = 9;
+        } else if(empty($_POST['password'])){
+            $_SESSION['error'] = 10;
+        }
+        header("Location:/admin/$page");
+    }
     //if an admin is being created, save it here
-    else if( $_SERVER['REQUEST_METHOD'] == 'POST'
+    else if($_SERVER['REQUEST_METHOD'] == 'POST'
              && $_POST['action'] == 'createuser'
              && !empty($_POST['username'])
              && !empty($_POST['password'])) {
         //include db credentials and connect to db
         include_once 'db.inc.php';
-        $db = new PDO(DB_INFO,DB_USER,DB_PASS);
+        $db = new PDO(DB_INFO, DB_USER, DB_PASS);
         $sql = "INSERT INTO admin (username, password)
                 VALUES (?, SHA1(?))";
         $stmt = $db->prepare($sql);
         $stmt->execute(array($_POST['username'], $_POST['password']));
         header('Location: /');
         exit;
-        }
+    }
+
     else if($_GET['action'] == 'logout')
     {
         session_destroy();
@@ -173,5 +207,5 @@ else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post commen
               $_SESSION['c_comment'],$_SESSION['error']);
         header('Location:../');
         exit;
-}
+    }
 ?>

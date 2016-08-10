@@ -77,6 +77,10 @@
         return $admin;
     }
 
+    function inputError(){
+        echo "error";
+    }
+
     function confirmDelete($db, $url)
     {
         $e = retrieveEntries($db,'',$url);
@@ -112,17 +116,6 @@ FORM;
         $replacements = array('-','');
         return preg_replace($patterns,$replacements,strtolower($title));
 }
-
-//    function rand_string($length = 5)
-//    {
-//        $char = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//        $charlength = strlen($char);
-//        $random = '';
-//        for($i = 0; $i < $length; $i++){
-//            $random .= $char[rand(0, $charlength) - 1];
-//        }
-//        return $random;
-//    }
 
     function getImagePath($db,$url)
     {
@@ -162,6 +155,7 @@ FORM;
         </fieldset>
     </form>
 FORM;
+
     }
 
     function shortenURL($url)

@@ -5,7 +5,7 @@
     {
         public $db;
         public $comments; //array for containing the entries
-        //when instantiated, oped db connection
+        //when instantiated, open db connection
         public function __construct()
         {
             $this->db = new PDO(DB_INFO,DB_USER,DB_PASS);
@@ -17,7 +17,13 @@
                 1 => '<p class="error">Something went wrong while saving '
                         . 'your comment. Please try again!</p>',
                 2 => '<p class="error">Please provide a valid email address!</p>',
-                3 => '<p class="error">Please answer the anti-spam question correctly!</p>'
+                3 => '<p class="error">Please answer the anti-spam question correctly!</p>',
+                4 => '<p class="error">Please enter your name!</p>',
+                5 => '<p class="error">Please fill out the comment field!</p>',
+                12 => '<p class="error">Please provide a valid name, email and comment!</p>',
+                13 => '<p class="error">Please provide a valid name and email!</p>',
+                14 => '<p class="error">Please provide a valid email and comment!</p>',
+                15 => '<p class="error">Please provide a valid name and comment!</p>'
             );
             if(isset($_SESSION['error'])){
                 $error = $errors[$_SESSION['error']];
@@ -71,15 +77,35 @@ FORM;
             $_SESSION['c_email'] = htmlentities($p['email'], ENT_QUOTES);
             $_SESSION['c_comment'] = htmlentities($p['comment'], ENT_QUOTES);
             //make sure the email is valid
-            if($this->validateEmail($p['email']) === FALSE){
+            if(!$this->validateEmail($p['email']) && !$this->validateName($p['name']) && !$this->validateComment($p['comment'])){
+                $_SESSION['error'] = 12;
+                return;
+            } else if(!$this->validateEmail($p['email']) && !$this->validateName($p['name'])){
+                $_SESSION['error'] = 13;
+                return;
+            } else if(!$this->validateEmail($p['email']) && !$this->validateComment($p['comment'])){
+                $_SESSION['error'] = 14;
+                return;
+            } else if(!$this->validateName($p['name']) && !$this->validateComment($p['comment'])){
+                $_SESSION['error'] = 15;
+                return;
+            } else if(!$this->validateEmail($p['email'])){
                 $_SESSION['error'] = 2;
                 return;
+            } else if(!$this->validateName($p['name'])){
+                $_SESSION['error'] = 4;
+                return;
+            } else if(!$this->validateComment($p['comment'])){
+                $_SESSION['error'] = 5;
+                return;
             }
-            //make sure the challenge was answered properly
-            if(!$this->verifyResponse($p['s_q'],$p['s_1'],$p['s_2'])){
+
+//            make sure the challenge was answered properly
+            else if(!$this->verifyResponse($p['s_q'],$p['s_1'],$p['s_2'])){
                 $_SESSION['error'] = 3;
                 return;
             }
+
             //sanitize data and store it in variables
             $blog_id = htmlentities(strip_tags($p['blog_id']),ENT_QUOTES);
             $name = htmlentities(strip_tags($p['name']),ENT_QUOTES);
@@ -99,7 +125,7 @@ FORM;
                       $_SESSION['c_comment'],$_SESSION['error']);
                 return;
             } else {
-                $_SESSIONp['error'] = 1;
+                $_SESSION['error'] = 1;
                 return;
             }
         }
@@ -225,6 +251,24 @@ FORM;
             return(preg_match($p,$email)) ? TRUE : FALSE;
         }
 
+        private function validateName($name)
+        {
+            if($name != NULL && $name != ""){
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
+        private function validateComment($comment)
+        {
+            if($comment != NULL && $comment != ""){
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
         private function generateChallenge()
         {
             //store two random numbers in an array
@@ -246,7 +290,7 @@ FORM;
             //grab session value and destroy it
             $val = $_SESSION['challenge'];
             unset($_SESSION['challenge']);
-            return $resp==$val;
+            return $resp == $val;
         }
 
 

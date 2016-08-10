@@ -1,5 +1,34 @@
 <?php
 session_start();
+$messageEntry = false;
+$messageAdmin = false;
+
+if(isset($_SESSION['error'])) {
+    switch ($_SESSION['error']) {
+        case 6:
+            $messageEntry = "Title can not be empty!";
+            break;
+        case 7:
+            $messageEntry = "Entry can not be empty!";
+            break;
+        case 8:
+            $messageEntry = "Title and Entry must not be empty!";
+            break;
+        case 9:
+            $messageAdmin = "Please enter a username!";
+            break;
+        case 10:
+            $messageAdmin = "Please enter a password!";
+            break;
+        case 11:
+            $messageAdmin = "Username and password must be filled!";
+            break;
+        default:
+            $messageEntry = false;
+            $messageAdmin = false;
+    }
+    unset($_SESSION['error']);
+}
 
     //if the user is logged in, continue
 if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
@@ -54,6 +83,8 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
         $long = NULL;
         $lat = NULL;
     }
+
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -79,6 +110,7 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
     ?>
         <form method="post" action="/inc/update.inc.php" enctype="multipart/form-data">
             <fieldset>
+                <p class="error"><?php echo $messageEntry;?></p>
                 <legend><?php echo $legend?></legend>
                 <label>Title
                     <input type="text" name="title" maxlength="150"
@@ -91,10 +123,10 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
                 <textarea name="entry" cols="45" rows="10"><?php echo sanitizeData($entry)?></textarea>
                 </label>
                 <label>Longitude
-                <input type="text" name="long" value="<?php echo sanitizeData($long)?>"/>
+                <input type="number" name="long" value="<?php echo sanitizeData($long)?>"/>
                 </label>
                 <label>Latitude
-                <input type="text" name="lat" value="<?php echo sanitizeData($lat)?>"/>
+                <input type="number" name="lat" value="<?php echo sanitizeData($lat)?>"/>
                 </label>
                 <input type="hidden" name="id" value="<?php echo $id?>"/>
                 <input type="hidden" name="page" value="<?php echo $page?>"/>
@@ -102,12 +134,15 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
                 <input type="submit" name="submit" value="Cancel"/>
             </fieldset>
         </form>
-    <?php endif; ?>
+        <?php endif; ?>
     </body>
 </html>
     <?php
     //the user is not logged in
-    else: ?>
+    else:
+
+
+        ?>
     <!DOCTYPE html
         PUBLIC "-//W3C//DTD XHTML 1.0 STRICT//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -122,6 +157,7 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
                   enctype="multipart/form-data">
                 <fieldset>
                     <legend>Please log in to continue</legend>
+                    <p class="error"><?php echo $messageAdmin;?></p>
                     <label>Username
                         <input type="text" name="username" maxlength="75"/>
                     </label>

@@ -17,10 +17,7 @@
 	$fulldisp = array_pop($e);
 	//sanitize
 	$e = sanitizeData($e);
-//    echo "<pre>";
-//    print_r($e);
-//    echo "</pre>";
-//    die;
+
 ?>
 
 <!DOCTYPE html
@@ -81,8 +78,10 @@
 ?>
 		<h2> <?php echo $e['title']?></h2>
 		<p> <?php echo $img,"<br/>",$e['entry']?></p>
-<!--         harta -->
-        <?php if($e['longitude'] != NULL && $e['latitude'] != NULL){?>
+<!--    harta -->
+        <?php if(($e['longitude'] != NULL || $e['longitude'] !=0) &&
+				($e['latitude'] != NULL || $e['latitude'] != 0)
+				){?>
         <div id="map"></div>
         <script>
             function initMap()
