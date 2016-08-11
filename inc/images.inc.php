@@ -1,7 +1,9 @@
 <?php
     class ImageHandler
     {
-        //folder where to save
+        /**
+         * @var $save_dir -> folder where images are saved
+         */
         public $save_dir;
         public $max_dims;
         //sets the $save_dir to instantiate
@@ -100,6 +102,7 @@
             return array($new_w, $new_h, $src_w, $src_h);
         }
 
+        //determine which function to use
         private function getImageFunctions($img)
         {
             $info = getimagesize($img);
@@ -142,5 +145,6 @@
                 throw new Exception('Could not resample the image!');
             }
         }
+
     }
 ?>

@@ -1,22 +1,26 @@
 <?php
-
+/**Function to retrieve entries
+ *
+ * @param $db
+ * @param $page
+ * @param null $url
+ * @return array|null
+ */
     function retrieveEntries($db,$page, $url=NULL)
     {
-        //get entries
-        if(isset($url)) {             //if an entry url was given
-            //load entry
+        if(isset($url)) {             //If an entry url was given
+            //Load a specific entry
             $sql = "SELECT id, page, title, longitude, latitude, image, entry, created
                     FROM entries
                     WHERE url=?
                     LIMIT 1";
             $stmt=$db->prepare($sql);
             $stmt->execute(array($url));
-            //save returned entry array
+            //Save returned entry array
             $e=$stmt->fetch();
             $fulldisp=1;
-        }
-        else {                        //if no entry url was given
-            //load all entry
+        } else {                        //If no entry url was given
+            //Load all entries
             $sql = "SELECT id, page, title, longitude, latitude, image, entry, url, created 
                     FROM entries
                     WHERE page=?
@@ -33,16 +37,15 @@
                     $fulldisp = 1;
                 }
             }
-
+            //If there are no entries
             if (!is_array($e)) {
                 $fulldisp = 1;
-                $e = array(
-                    'title' => 'No entries Yet',
-                    'entry' => '<a href="/admin/contact">Post an entry!</a>'
-                );
+                $e = array('title' => 'No entries Yet',
+                           'entry' => '<a href="/admin/contact">Post an entry!</a>'
+                    );
             }
         }
-        //add $fulldisp to $e array, because function can not return 2 values
+        //Add $fulldisp to $e array, because function can not return two values
         array_push($e,$fulldisp);
         //return loaded data
         return $e;
@@ -63,8 +66,11 @@
         }
     }
 
-
-
+/**Build links for admin
+ * @param $page
+ * @param $url
+ * @return $admin array
+ */
     function adminLinks($page, $url)
     {
         //format link for each option
@@ -77,10 +83,7 @@
         return $admin;
     }
 
-    function inputError(){
-        echo "error";
-    }
-
+//Retrieves a form to confirm your decision
     function confirmDelete($db, $url)
     {
         $e = retrieveEntries($db,'',$url);
@@ -98,6 +101,7 @@
 FORM;
     }
 
+//Deletes an entry
     function deleteEntry($db,$url)
     {
         $sql = "DELETE FROM entries
@@ -115,8 +119,9 @@ FORM;
         );
         $replacements = array('-','');
         return preg_replace($patterns,$replacements,strtolower($title));
-}
+    }
 
+//Function to return the folder where the image is, and its name
     function getImagePath($db,$url)
     {
         $sql = "SELECT image FROM entries
@@ -137,6 +142,7 @@ FORM;
         }
     }
 
+//Form for creating a new admin user
     function createUserForm()
     {
         return <<<FORM
@@ -155,7 +161,6 @@ FORM;
         </fieldset>
     </form>
 FORM;
-
     }
 
     function shortenURL($url)

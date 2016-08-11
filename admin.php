@@ -1,88 +1,89 @@
 <?php
-session_start();
-$messageEntry = false;
-$messageAdmin = false;
-
-if(isset($_SESSION['error'])) {
-    switch ($_SESSION['error']) {
-        case 6:
-            $messageEntry = "Title can not be empty!";
-            break;
-        case 7:
-            $messageEntry = "Entry can not be empty!";
-            break;
-        case 8:
-            $messageEntry = "Title and Entry must not be empty!";
-            break;
-        case 9:
-            $messageAdmin = "Please enter a username!";
-            break;
-        case 10:
-            $messageAdmin = "Please enter a password!";
-            break;
-        case 11:
-            $messageAdmin = "Username and password must be filled!";
-            break;
-        default:
-            $messageEntry = false;
-            $messageAdmin = false;
+    session_start();
+    $messageEntry = false;
+    $messageAdmin = false;
+    //Switch case for handling errors from entry submission or admin login
+    if(isset($_SESSION['error'])) {
+        switch ($_SESSION['error']) {
+            case 6:
+                $messageEntry = "Title can not be empty!";
+                break;
+            case 7:
+                $messageEntry = "Entry can not be empty!";
+                break;
+            case 8:
+                $messageEntry = "Title and Entry must not be empty!";
+                break;
+            case 9:
+                $messageAdmin = "Please enter a username!";
+                break;
+            case 10:
+                $messageAdmin = "Please enter a password!";
+                break;
+            case 11:
+                $messageAdmin = "Username and password must be filled!";
+                break;
+            default:
+                $messageEntry = false;
+                $messageAdmin = false;
+        }
+        unset($_SESSION['error']);
     }
-    unset($_SESSION['error']);
-}
 
     //if the user is logged in, continue
-if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
-    include_once 'inc/functions.inc.php';
-    include_once 'inc/db.inc.php';
+    if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
+        include_once 'inc/functions.inc.php';
+        include_once 'inc/db.inc.php';
 
-    $db = new PDO(DB_INFO,DB_USER,DB_PASS);
-    if(isset($_GET['page'])) {
-        $page = htmlentities(strip_tags($_GET['page']));
-    } else {
-        $page='blog';
-    }
-    if(isset($_POST['action']) && $_POST['action'] == 'delete'){
-        if($_POST['submit'] == 'Yes'){
-            $url = htmlentities(strip_tags($_POST['url']));
-            $path = getImagePath($db, $url);
-            if(deleteEntry($db,$url)){
-                $absolute = $_SERVER['DOCUMENT_ROOT'].$path;
-                unlink($absolute);
-                header("Location: /");
-                exit;
-            } else {
-                exit("Error deleting the entry!");
-            }
+        $db = new PDO(DB_INFO,DB_USER,DB_PASS);
+        if(isset($_GET['page'])) {
+            $page = htmlentities(strip_tags($_GET['page']));
         } else {
-            header("Location: /blog/$url");
-            exit;
+            $page='blog';
         }
-    }
-    if(isset($_GET['url'])){
-        $url = htmlentities(strip_tags($_GET['url']));
-        if($page == 'delete') {
-            $confirm = confirmDelete($db,$url);
+        //Delete entry and delete image from folder
+        if(isset($_POST['action']) && $_POST['action'] == 'delete'){
+            if($_POST['submit'] == 'Yes'){
+                $url = htmlentities(strip_tags($_POST['url']));
+                $path = getImagePath($db, $url);
+                if(deleteEntry($db,$url)){
+                    $absolute = $_SERVER['DOCUMENT_ROOT'].$path;
+                    unlink($absolute);
+                    header("Location: /");
+                    exit;
+                } else {
+                    exit("Error deleting the entry!");
+                }
+            } else {
+                header("Location: /blog/$url");
+                exit;
+            }
         }
-        $legend = "Edit this entry";
-        $e = retrieveEntries($db, $page, $url);
+        if(isset($_GET['url'])){
+            $url = htmlentities(strip_tags($_GET['url']));
+            if($page == 'delete') {
+                $confirm = confirmDelete($db,$url);
+            }
+            $legend = "Edit this entry";
+            $e = retrieveEntries($db, $page, $url);
         //save each entry as individual variables
-        $id = $e['id'];
-        $title = $e['title'];
-        $entry = $e['entry'];
-        $long = $e['longitude'];
-        $lat = $e['latitude'];
-    } else {
-        if($page == 'createuser'){
-            $create = createUserForm();
-        }
-        $legend = "New entry submission";
+            $id = $e['id'];
+            $title = $e['title'];
+            $entry = $e['entry'];
+            $long = $e['longitude'];
+            $lat = $e['latitude'];
+        } else {
+            if($page == 'createuser'){
+                $create = createUserForm();
+            }
+            $legend = "New entry submission";
         //if not editing, set variables to null
-        $id = NULL;
-        $title = NULL;
-        $entry = NULL;
-        $long = NULL;
-        $lat = NULL;
-    }
+            $id = NULL;
+            $title = NULL;
+            $entry = NULL;
+            $long = NULL;
+            $lat = NULL;
+        }
 
 
 ?>
@@ -140,8 +141,6 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
     <?php
     //the user is not logged in
     else:
-
-
         ?>
     <!DOCTYPE html
         PUBLIC "-//W3C//DTD XHTML 1.0 STRICT//EN"
@@ -168,7 +167,6 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
                     <input type="submit" name="submit" value="Log In"/>
                 </fieldset>
             </form>
-
         </body>
     </html>
 <?php endif; ?>

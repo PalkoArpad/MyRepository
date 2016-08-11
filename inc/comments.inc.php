@@ -3,8 +3,11 @@
 
     class Comments
     {
+        /**
+         * @var $comments -> array containing the comment entries
+         */
         public $db;
-        public $comments; //array for containing the entries
+        public $comments;
         //when instantiated, open db connection
         public function __construct()
         {
@@ -13,7 +16,8 @@
 
         public function showCommentForm($blog_id)
         {
-            $errors = array(
+            $errors =
+                array(
                 1 => '<p class="error">Something went wrong while saving '
                         . 'your comment. Please try again!</p>',
                 2 => '<p class="error">Please provide a valid email address!</p>',
@@ -24,24 +28,24 @@
                 13 => '<p class="error">Please provide a valid name and email!</p>',
                 14 => '<p class="error">Please provide a valid email and comment!</p>',
                 15 => '<p class="error">Please provide a valid name and comment!</p>'
-            );
-            if(isset($_SESSION['error'])){
+                );
+            if(isset($_SESSION['error'])) {
                 $error = $errors[$_SESSION['error']];
             } else {
                 $error = NULL;
             }
             //check if session variable exist
-            if(isset($_SESSION['c_name'])){
+            if(isset($_SESSION['c_name'])) {
                 $n = $_SESSION['c_name'];
             } else {
                 $n = NULL;
             }
-            if(isset($_SESSION['c_email'])){
+            if(isset($_SESSION['c_email'])) {
                 $e = $_SESSION['c_email'];
             } else {
                 $e = NULL;
             }
-            if(isset($_SESSION['c_comment'])){
+            if(isset($_SESSION['c_comment'])) {
                 $c = $_SESSION['c_comment'];
             } else {
                 $c = NULL;
@@ -68,7 +72,7 @@
         </fieldset>
         </form>
 FORM;
-        }
+    }
 
         public function saveComment($p)
         {
@@ -76,32 +80,33 @@ FORM;
             $_SESSION['c_name'] = htmlentities($p['name'], ENT_QUOTES);
             $_SESSION['c_email'] = htmlentities($p['email'], ENT_QUOTES);
             $_SESSION['c_comment'] = htmlentities($p['comment'], ENT_QUOTES);
-            //make sure the email is valid
-            if(!$this->validateEmail($p['email']) && !$this->validateName($p['name']) && !$this->validateComment($p['comment'])){
+            //make sure the email,name and comment are valid
+            if(!$this->validateEmail($p['email']) && !$this->validateName($p['name']) && !$this->validateComment($p['comment'])) {
                 $_SESSION['error'] = 12;
                 return;
-            } else if(!$this->validateEmail($p['email']) && !$this->validateName($p['name'])){
+            } else if(!$this->validateEmail($p['email']) && !$this->validateName($p['name'])) {
+                //check if email and name are valid
                 $_SESSION['error'] = 13;
                 return;
-            } else if(!$this->validateEmail($p['email']) && !$this->validateComment($p['comment'])){
+            } else if(!$this->validateEmail($p['email']) && !$this->validateComment($p['comment'])) {
+                //check if email and comment are valid
                 $_SESSION['error'] = 14;
                 return;
-            } else if(!$this->validateName($p['name']) && !$this->validateComment($p['comment'])){
+            } else if(!$this->validateName($p['name']) && !$this->validateComment($p['comment'])) {
+                //check if name and comment are valid
                 $_SESSION['error'] = 15;
                 return;
-            } else if(!$this->validateEmail($p['email'])){
+            } else if(!$this->validateEmail($p['email'])) {
                 $_SESSION['error'] = 2;
                 return;
-            } else if(!$this->validateName($p['name'])){
+            } else if(!$this->validateName($p['name'])) {
                 $_SESSION['error'] = 4;
                 return;
-            } else if(!$this->validateComment($p['comment'])){
+            } else if(!$this->validateComment($p['comment'])) {
                 $_SESSION['error'] = 5;
                 return;
-            }
-
-//            make sure the challenge was answered properly
-            else if(!$this->verifyResponse($p['s_q'],$p['s_1'],$p['s_2'])){
+            } else if(!$this->verifyResponse($p['s_q'],$p['s_1'],$p['s_2'])) {
+                //make sure the challenge was answered properly
                 $_SESSION['error'] = 3;
                 return;
             }
@@ -139,7 +144,7 @@ FORM;
                     ORDER BY date DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array($blog_id));
-            //loop throught returned rows
+            //loop through the returned rows
             while($comment = $stmt->fetch()){
                 //store in memory for later use
                 $this->comments[] = $comment;
@@ -162,9 +167,9 @@ FORM;
             //retrieve comments for the entry
             $this->retrieveComments($blog_id);
             //loop through the store comments
-            foreach($this->comments as $c){
+            foreach($this->comments as $c) {
                 //prevent empty fields if no comments exist
-                if(!empty($c['date']) && !empty($c['name'])){
+                if(!empty($c['date']) && !empty($c['name'])) {
                     // July 8, 2009 at 4:39PM
                     $format = "F j, Y \a\\t g:iA";
                     $date = date($format, strtotime($c['date']));
@@ -223,7 +228,6 @@ FORM;
     </body>
 </html>
 FORM;
-
         }
 
         public function deleteComment($id)
@@ -231,7 +235,7 @@ FORM;
             $sql = "DELETE FROM comments
                     WHERE id=?
                     LIMIT 1";
-            if($stmt = $this->db->prepare($sql)){
+            if($stmt = $this->db->prepare($sql)) {
                 //execute cmd, free used memory,return true
                 $stmt->execute(array($id));
                 $stmt->closeCursor();
@@ -246,7 +250,6 @@ FORM;
             //matches valid email address
             $p = '/^[\w-]+(\.[\w-]+)*@[a-z0-9-]+'
                 .'(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i';
-
             //if match found, return true, otherwise return false
             return(preg_match($p,$email)) ? TRUE : FALSE;
         }
@@ -292,7 +295,6 @@ FORM;
             unset($_SESSION['challenge']);
             return $resp == $val;
         }
-
 
     }
 ?>

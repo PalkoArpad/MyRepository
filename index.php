@@ -4,7 +4,7 @@
 	include_once 'inc/db.inc.php';
 	//open db connection
 	$db = new PDO(DB_INFO,DB_USER,DB_PASS);
-    //what page is requested
+    //check what page is requested, set default
     if(isset($_GET['page'])) {
         $page=htmlentities(strip_tags($_GET['page']));
     } else {
@@ -78,10 +78,8 @@
 ?>
 		<h2> <?php echo $e['title']?></h2>
 		<p> <?php echo $img,"<br/>",$e['entry']?></p>
-<!--    harta -->
-        <?php if(($e['longitude'] != NULL || $e['longitude'] !=0) &&
-				($e['latitude'] != NULL || $e['latitude'] != 0)
-				){?>
+<!--    MAP    -->
+        <?php if(($e['longitude'] != NULL) && ($e['latitude'] != NULL)) {?>
         <div id="map"></div>
         <script>
             function initMap()
@@ -95,7 +93,7 @@
             }
         </script>
         <script async defer src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBHS5iSlZuLpuSZmIXVLuwsqnieIPKNyE&callback=initMap"></script>
-		<p> <?php }?></p>
+		<?php } ?>
         <p>
             <?php echo $admin['edit']?>
             <?php if($page == 'blog') echo $admin['delete']?>
@@ -106,7 +104,7 @@
 		    	<a href="./">Back to the Latest Entries</a>
 		    </p>
         <h3>Comments for this entry</h3>
-        <?php echo $comments_disp, $comment_form; endif; ?>
+            <?php echo $comments_disp, $comment_form; endif; ?>
 <?php
 	} else {
 		foreach($e as $entry) {
@@ -129,9 +127,7 @@
 		<a href="/admin/<?php echo $page?>">Post a New Entry</a>
         <?php endif; ?>
 	</p>
-    <p>
-        <a href="/feeds/rss.php">Subscribe via RSS!</a>
-    </p>
+    <p> <br/> <a href="/feeds/rss.php">Subscribe via RSS!</a> </p>
 	</div>
 </body>
 </html>
