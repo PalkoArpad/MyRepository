@@ -1,11 +1,11 @@
 <?php
-/**Function to retrieve entries
- *
- * @param $db
- * @param $page
- * @param null $url
- * @return array|null
- */
+    /**Function to retrieve entries
+    *
+    * @param $db
+    * @param $page
+    * @param null $url
+    * @return array|null
+    */
     function retrieveEntries($db,$page, $url=NULL)
     {
         if(isset($url)) {             //If an entry url was given
@@ -51,6 +51,12 @@
         return $e;
     }
 
+    /**
+     * Sanitizes data
+     *
+     * @param $data
+     * @return array|string|sanitizeData
+     */
     function sanitizeData($data)
     {
         //if data is not an array -> strip_tags()
@@ -66,11 +72,11 @@
         }
     }
 
-/**Build links for admin
- * @param $page
- * @param $url
- * @return $admin array
- */
+    /**Build links for admin
+    * @param $page
+    * @param $url
+    * @return $admin array
+    */
     function adminLinks($page, $url)
     {
         //format link for each option
@@ -83,7 +89,13 @@
         return $admin;
     }
 
-//Retrieves a form to confirm your decision
+    /**
+    * Generates a form to confirm you decision on deleting entry
+    *
+    * @param $db
+    * @param $url
+    * @return string
+    */
     function confirmDelete($db, $url)
     {
         $e = retrieveEntries($db,'',$url);
@@ -101,7 +113,13 @@
 FORM;
     }
 
-//Deletes an entry
+    /**
+    *  Deletes an entry
+    *
+    * @param $db
+    * @param $url
+    * @return mixed
+    */
     function deleteEntry($db,$url)
     {
         $sql = "DELETE FROM entries
@@ -111,6 +129,12 @@ FORM;
         return $stmt->execute(array($url));
     }
 
+    /**
+     * Generates friendly url
+     *
+     * @param $title
+     * @return mixed
+     */
     function makeURL($title)
     {
         $patterns = array(
@@ -121,7 +145,13 @@ FORM;
         return preg_replace($patterns,$replacements,strtolower($title));
     }
 
-//Function to return the folder where the image is, and its name
+    /**
+     * Generates the folder where the image is stored, and the image name
+     *
+     * @param $db
+     * @param $url
+     * @return mixed
+     */
     function getImagePath($db,$url)
     {
         $sql = "SELECT image FROM entries
@@ -133,6 +163,13 @@ FORM;
         return $p['image'];
     }
 
+    /**
+     * Formats image
+     *
+     * @param null $img
+     * @param null $alt
+     * @return null|string
+     */
     function formatImage($img=NULL, $alt=NULL)
     {
         if($img!=NULL){
@@ -142,7 +179,7 @@ FORM;
         }
     }
 
-//Form for creating a new admin user
+    //Form for creating a new admin user
     function createUserForm()
     {
         return <<<FORM
@@ -163,6 +200,11 @@ FORM;
 FORM;
     }
 
+     /**Shortens url using bit.ly
+      *
+      * @param $url
+      * @return mixed
+      */
     function shortenURL($url)
     {
         //format a all to the bit.ly API
@@ -177,6 +219,12 @@ FORM;
         return $bitly->results->nodeKeyVal->shortUrl;
     }
 
+    /**
+     * Generates a link to post on twitter
+     *
+     * @param $title
+     * @return string
+     */
     function postToTwitter($title)
     {
         $full = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];

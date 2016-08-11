@@ -137,7 +137,7 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
         header('Location:'.$loc);
         exit;
 
-} else if($_GET['action'] == 'comment_delete'){
+} else if($_GET['action'] == 'comment_delete') {
         //include and instantiate the Comments class
         include_once 'comments.inc.php';
         $comments = new Comments();

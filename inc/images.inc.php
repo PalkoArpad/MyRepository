@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class ImageHandler
+ */
     class ImageHandler
     {
         /**
@@ -15,6 +19,7 @@
 
         /**
          * Resizes/resamples an image uploaded via a web form
+         *
          * @param array $upload the array contained in $_FILES
          * @return string the path to the resized upload file
          */
@@ -47,13 +52,24 @@
             return $filepath;
         }
 
-        //generate a unique file name
+        /**
+         * Generates a unique file name
+         *
+         * @param $ext
+         * @return string
+         */
         private function renameFile($ext)
         {
             return time() . '_' . mt_rand(1000,9999) . $ext;
         }
 
-        //determine file type and extension
+        /**
+         * Determines image type and returns its extension
+         *
+         * @param $type
+         * @return string
+         * @throws Exception
+         */
         private function getImageExtension($type)
         {
             switch ($type) {
@@ -69,6 +85,12 @@
             }
         }
 
+        /**
+         * Checks if saving directory exists
+         * If not, creates it
+         *
+         * @throws Exception
+         */
         private function checkSaveDir()
         {
             //determines the path to check
@@ -82,6 +104,13 @@
             }
         }
 
+        /**
+         * Determines if an image is too big for display
+         * Returns new dimensions
+         *
+         * @param $img
+         * @return array
+         */
         private function getNewDims($img)
         {
             //necessary variables for processing
@@ -102,7 +131,12 @@
             return array($new_w, $new_h, $src_w, $src_h);
         }
 
-        //determine which function to use
+        /**
+         * Determines which image create function is needed
+         *
+         * @param $img
+         * @return array|bool
+         */
         private function getImageFunctions($img)
         {
             $info = getimagesize($img);
@@ -123,6 +157,12 @@
             }
         }
 
+        /**
+         * Resamples the image
+         *
+         * @param $img
+         * @throws Exception
+         */
         private function doImageResize($img)
         {
             //determine the new dimesnsions

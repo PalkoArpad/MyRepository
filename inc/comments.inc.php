@@ -1,6 +1,9 @@
 <?php
     include_once 'db.inc.php';
 
+/**
+ * Class Comments
+ */
     class Comments
     {
         /**
@@ -14,23 +17,52 @@
             $this->db = new PDO(DB_INFO,DB_USER,DB_PASS);
         }
 
+        /**
+         * Returns a form for the comment section
+         *
+         * @param $blog_id
+         * @return string
+         */
         public function showCommentForm($blog_id)
         {
-            $errors =
-                array(
-                1 => '<p class="error">Something went wrong while saving '
-                        . 'your comment. Please try again!</p>',
-                2 => '<p class="error">Please provide a valid email address!</p>',
-                3 => '<p class="error">Please answer the anti-spam question correctly!</p>',
-                4 => '<p class="error">Please enter your name!</p>',
-                5 => '<p class="error">Please fill out the comment field!</p>',
-                12 => '<p class="error">Please provide a valid name, email and comment!</p>',
-                13 => '<p class="error">Please provide a valid name and email!</p>',
-                14 => '<p class="error">Please provide a valid email and comment!</p>',
-                15 => '<p class="error">Please provide a valid name and comment!</p>'
-                );
+            $errors = false;
             if(isset($_SESSION['error'])) {
-                $error = $errors[$_SESSION['error']];
+                switch ($_SESSION['error']) {
+                    case 1 :
+                        $errors = 'Something went wrong while saving your comment. Please try again!';
+                        break;
+                    case 2 :
+                        $errors = 'Please provide a valid email address!';
+                        break;
+                    case 3 :
+                        $errors = 'Please answer the anti-spam question correctly!';
+                        break;
+                    case 4 :
+                        $errors = 'Please enter your name!';
+                        break;
+                    case 5 :
+                        $errors = 'Please fill out the comment field!';
+                        break;
+                    case 12 :
+                        $errors = 'Please provide a valid name, email and comment!';
+                        break;
+                    case 13 :
+                        $errors = 'Please provide a valid name and email!';
+                        break;
+                    case 14 :
+                        $errors = 'Please provide a valid email and comment!';
+                        break;
+                    case 15 :
+                        $errors = 'Please provide a valid name and comment!';
+                        break;
+                    default :
+                        $errors = false;
+                        break;
+                }
+            }
+
+            if(isset($_SESSION['error'])) {
+                $error = "<p class='error'>$errors</p>";
             } else {
                 $error = NULL;
             }
@@ -74,6 +106,51 @@
 FORM;
     }
 
+        private function generateError($err)
+        {
+            $err = false;
+            if(isset($_SESSION['error'])) {
+                switch ($_SESSION['error']) {
+                    case 1 :
+                        $err = "Something went wrong while saving your comment. Please try again!";
+                        break;
+                    case 2 :
+                        $err = "Please provide a valid email address!";
+                        break;
+                    case 3 :
+                        $err = "Please answer the anti-spam question correctly!";
+                        break;
+                    case 4 :
+                        $err = "Please enter your name!";
+                        break;
+                    case 5 :
+                        $err = "Please fill out the comment field!";
+                        break;
+                    case 12 :
+                        $err = "Please provide a valid name, email and comment!";
+                        break;
+                    case 13 :
+                        $err = "Please provide a valid name and email!";
+                        break;
+                    case 14 :
+                        $err = "Please provide a valid email and comment!";
+                        break;
+                    case 15 :
+                        $err = '<p class="error">Please provide a valid name and comment!</p>';
+                        break;
+                    default :
+                        $err = false;
+                        break;
+                    //15 => '<p class="error">Please provide a valid name and comment!</p>'
+                }
+            }
+        }
+
+        /**
+         * Saves comment in database after checking if fields were completed correctly
+         *
+         * @param $p
+         */
         public function saveComment($p)
         {
             //save comment info in a session
@@ -116,8 +193,10 @@ FORM;
             $name = htmlentities(strip_tags($p['name']),ENT_QUOTES);
             $email = htmlentities(strip_tags($p['email']),ENT_QUOTES);
             $comment = htmlentities(strip_tags($p['comment']),ENT_QUOTES);
+
             //keep formatting of comments and remove extra whitespace
             $comment = nl2br(trim($comment));
+
             //generate and prepare SQL command
             $sql = "INSERT INTO comments (blog_id, name, email, comment)
                     VALUES (?,?,?,?)";
@@ -128,13 +207,18 @@ FORM;
                 //destroy the comment information to empty the form
                 unset($_SESSION['c_name'],$_SESSION['c_email'],
                       $_SESSION['c_comment'],$_SESSION['error']);
-                return;
             } else {
                 $_SESSION['error'] = 1;
-                return;
             }
+            return;
         }
 
+        /**
+         * Retrieve comments from database for later usage
+         * If there are no comments in entry, sets default value
+         *
+         * @param $blog_id
+         */
         public function retrieveComments($blog_id)
         {
             //get all the comments for the entry
@@ -161,6 +245,12 @@ FORM;
             }
         }
 
+        /**
+         * Show comments for entry
+         *
+         * @param $blog_id
+         * @return null|string
+         */
         public function showComments($blog_id)
         {
             $display = NULL;
@@ -196,6 +286,12 @@ FORM;
             return $display;
         }
 
+        /**
+         * Returns a form to confirm your decision on deleting
+         *
+         * @param $id
+         * @return string
+         */
         public function confirmDelete($id)
         {
             //store the entry url if available
@@ -230,6 +326,12 @@ FORM;
 FORM;
         }
 
+        /**
+         * Deletes one specific comment
+         *
+         * @param $id
+         * @return bool
+         */
         public function deleteComment($id)
         {
             $sql = "DELETE FROM comments
@@ -245,6 +347,12 @@ FORM;
             }
         }
 
+        /**
+         * Checks if input on email field was entered correctly
+         *
+         * @param $email
+         * @return bool
+         */
         private function validateEmail($email)
         {
             //matches valid email address
@@ -254,6 +362,12 @@ FORM;
             return(preg_match($p,$email)) ? TRUE : FALSE;
         }
 
+        /**
+         * Checks if a name was given
+         *
+         * @param $name
+         * @return bool
+         */
         private function validateName($name)
         {
             if($name != NULL && $name != ""){
@@ -263,6 +377,12 @@ FORM;
             }
         }
 
+        /**
+         * Checks if a comment was entered
+         *
+         * @param $comment
+         * @return bool
+         */
         private function validateComment($comment)
         {
             if($comment != NULL && $comment != ""){
@@ -272,6 +392,11 @@ FORM;
             }
         }
 
+        /**
+         * Generates a security challenge
+         *
+         * @return string
+         */
         private function generateChallenge()
         {
             //store two random numbers in an array
@@ -288,6 +413,13 @@ FORM;
             </label>";
         }
 
+
+        /**
+         * Verifies if the security question was answered correctly
+         *
+         * @param $resp
+         * @return bool
+         */
         private function verifyResponse($resp)
         {
             //grab session value and destroy it
