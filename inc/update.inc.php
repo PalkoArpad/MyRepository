@@ -30,7 +30,11 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
     $db = new PDO(DB_INFO, DB_USER, DB_PASS);
     //edit an existing entry
     if(!empty($_POST['id'])){
-        //$url = $url . $_POST['id'];
+        $path = getImagePath($db, $url);
+        if($path != NULL) {
+            $absolute = $_SERVER['DOCUMENT_ROOT'] . $path;
+            unlink($absolute);
+        }
         $sql = "UPDATE entries
                 SET title=?, longitude=?, latitude=?, image=?, entry=?, url=?
                 WHERE id=?
@@ -47,8 +51,10 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
             )
         );
         $stmt->closeCursor();
+        $page = htmlentities(strip_tags($_POST['page']));
+        header("Location: /$page");
     } else {
-        //save entry to database
+        //save entry to databasec
         $sql = "INSERT INTO entries (page, title, longitude, latitude, image, entry, url) 
                 VALUES (?,?,?,?,?,?,?)";
         $stmt = $db->prepare($sql);
