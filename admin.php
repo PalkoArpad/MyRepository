@@ -114,14 +114,16 @@
                 <p class="error"><?php echo $messageEntry;?></p>
                 <legend><?php echo $legend?></legend>
                 <label>Title
-                    <input type="text" name="title" maxlength="150"
+                    <input <?php if($messageEntry == "Title and Entry must not be empty!" || $messageEntry == "Title can not be empty!")
+                            {?>class="errorborder"<?php }?> type="text" name="title" maxlength="150"
                             value="<?php echo htmlentities($title)?>"/>
                 </label>
                 <label>Image
                     <input type="file" name="image"/>
                 </label>
                 <label>Entry
-                <textarea name="entry" cols="45" rows="10"><?php echo sanitizeData($entry)?></textarea>
+                <textarea <?php if($messageEntry == "Title and Entry must not be empty!" || $messageEntry == "Entry can not be empty!")
+                          {?>class="errorborder"<?php }?> name="entry" cols="45" rows="10"><?php echo sanitizeData($entry)?></textarea>
                 </label>
                 <label>Longitude
                 <input type="number" name="long" value="<?php echo sanitizeData($long)?>"/>

@@ -106,46 +106,6 @@
 FORM;
     }
 
-        private function generateError($err)
-        {
-            $err = false;
-            if(isset($_SESSION['error'])) {
-                switch ($_SESSION['error']) {
-                    case 1 :
-                        $err = "Something went wrong while saving your comment. Please try again!";
-                        break;
-                    case 2 :
-                        $err = "Please provide a valid email address!";
-                        break;
-                    case 3 :
-                        $err = "Please answer the anti-spam question correctly!";
-                        break;
-                    case 4 :
-                        $err = "Please enter your name!";
-                        break;
-                    case 5 :
-                        $err = "Please fill out the comment field!";
-                        break;
-                    case 12 :
-                        $err = "Please provide a valid name, email and comment!";
-                        break;
-                    case 13 :
-                        $err = "Please provide a valid name and email!";
-                        break;
-                    case 14 :
-                        $err = "Please provide a valid email and comment!";
-                        break;
-                    case 15 :
-                        $err = '<p class="error">Please provide a valid name and comment!</p>';
-                        break;
-                    default :
-                        $err = false;
-                        break;
-                    //15 => '<p class="error">Please provide a valid name and comment!</p>'
-                }
-            }
-        }
-
         /**
          * Saves comment in database after checking if fields were completed correctly
          *

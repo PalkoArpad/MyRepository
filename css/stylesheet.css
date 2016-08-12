@@ -93,3 +93,7 @@ input[type=hidden]{
 	height:400px;
 	background-color: grey;
 }
+
+.errorborder {
+    border: 1px solid #FF0000;
+}
