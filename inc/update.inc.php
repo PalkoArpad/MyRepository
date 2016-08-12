@@ -118,8 +118,8 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
             } else if(empty($_POST['title'])) {
                 $_SESSION['error'] = 6;
             }
-        $page = htmlentities(strip_tags($_POST['page']));
-        header("Location:/admin/$page");
+//        $page = htmlentities(strip_tags($_POST['page']));
+//        header("Location:/admin/$page/'#comment-form'");
 
 } else if($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['submit'] == 'Post comment') {      //if a comment is being posted, handle it here
         //include and instantiate Comments class

@@ -26,6 +26,9 @@
         public function showCommentForm($blog_id)
         {
             $errors = false;
+            $classC = "";
+            $classE = "";
+            $classN = "";
             if(isset($_SESSION['error'])) {
                 switch ($_SESSION['error']) {
                     case 1 :
@@ -33,30 +36,45 @@
                         break;
                     case 2 :
                         $errors = 'Please provide a valid email address!';
+                        $classE = 'errorborder';
                         break;
                     case 3 :
                         $errors = 'Please answer the anti-spam question correctly!';
                         break;
                     case 4 :
                         $errors = 'Please enter your name!';
+                        $classN = 'errorborder';
                         break;
                     case 5 :
                         $errors = 'Please fill out the comment field!';
+                        $classC = 'errorborder';
                         break;
                     case 12 :
                         $errors = 'Please provide a valid name, email and comment!';
+                        $classE = 'errorborder';
+                        $classN = 'errorborder';
+                        $classC = 'errorborder';
                         break;
                     case 13 :
                         $errors = 'Please provide a valid name and email!';
+                        $classN = 'errorborder';
+                        $classE = 'errorborder';
                         break;
                     case 14 :
                         $errors = 'Please provide a valid email and comment!';
+                        $classE = 'errorborder';
+                        $classC = 'errorborder';
                         break;
                     case 15 :
                         $errors = 'Please provide a valid name and comment!';
+                        $classN = 'errorborder';
+                        $classC = 'errorborder';
                         break;
                     default :
                         $errors = false;
+                        $classC = "";
+                        $classE = "";
+                        $classN = "";
                         break;
                 }
             }
@@ -86,17 +104,18 @@
             $challenge = $this->generateChallenge();
 
             return <<<FORM
-        <form action="/inc/update.inc.php" method="post" id="comment-form">
+        <form action="/inc/update.inc.php#comment-form" method="post" id="comment-form">
+        
         <fieldset>
             <legend>Post a Comment</legend>$error
             <label>Name
-                <input type="text" name="name" maxlength="75" value="$n"/>
+                <input class="$classN" type="text" name="name" maxlength="75" value="$n"/>
             </label>
             <label>Email
-                <input type="text" name="email" maxlength="150" value="$e"/>
+                <input class="$classE" type="text" name="email" maxlength="150" value="$e"/>
             </label>
             <label>Comment
-                <textarea rows="10" cols="45" name="comment">$c</textarea>
+                <textarea class="$classC" rows="10" cols="45" name="comment">$c</textarea>
             </label>$challenge
             <input type="hidden" name="blog_id" value="$blog_id"/>
             <input type="submit" name="submit" value="Post comment"/>
@@ -372,7 +391,6 @@ FORM;
                     <input type=\"text\" name=\"s_q\" />
             </label>";
         }
-
 
         /**
          * Verifies if the security question was answered correctly
