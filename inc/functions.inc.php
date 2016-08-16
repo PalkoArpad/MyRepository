@@ -233,5 +233,11 @@ FORM;
         return 'http://twitter.com/?status='.urlencode($status);
     }
 
+    function postToFacebook()
+    {
+        $full = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        return "http://www.facebook.com/share.php?u=".$full;
+    }
+
 
 ?>

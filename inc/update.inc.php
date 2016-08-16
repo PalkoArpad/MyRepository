@@ -128,10 +128,10 @@ if(($_SERVER['REQUEST_METHOD']=="POST")
         //save the comment
         $comments->saveComment($_POST);
         //if available, store the entry the user came from
-        if(isset($_SERVER['HTTP_REFERER'])){
-            $loc = $_SERVER['HTTP_REFERER'];
+        if($_SESSION['error']) {
+            $loc = $_SERVER['HTTP_REFERER']."#comment-form";
         } else {
-            $loc = '../';
+            $loc = $_SERVER['HTTP_REFERER'];
         }
             //send the user back to the entry
         header('Location:'.$loc);

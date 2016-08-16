@@ -102,9 +102,14 @@
             }
             //generate a challenge question
             $challenge = $this->generateChallenge();
+            if($errors == false) {
+                $scroll = "";
+            } else {
+                $scroll = "#comment-form";
+            }
 
             return <<<FORM
-        <form action="/inc/update.inc.php#comment-form" method="post" id="comment-form">
+        <form action="/inc/update.inc.php" method="post" id="comment-form">
         
         <fieldset>
             <legend>Post a Comment</legend>$error

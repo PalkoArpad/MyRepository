@@ -70,9 +70,11 @@
             $comment_form = $comments->showCommentForm($e['id']);
 			//generate post to Twitter link
 			$twitter = postToTwitter($e['title']);
+			$facebook = postToFacebook();
         } else {
             $comment_form = NULL;
 			$twitter = NULL;
+			$facebook = NULL;
         }
 
 ?>
@@ -101,6 +103,7 @@
         <?php if ($page == 'blog'): ?>
 		    <p class="backlink">
                 <a href="<?php echo $twitter?>">Post to Twitter</a><br/>
+				<a href="<?php echo $facebook?>">Post to Facebook</a><br/>
 		    	<a href="./">Back to the Latest Entries</a>
 		    </p>
         <h3>Comments for this entry</h3>
